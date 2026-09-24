@@ -1,0 +1,4 @@
+-r base.txt
+# Driver PostgreSQL — à activer dès que l'infra Postgres est en place
+# (voir CLAUDE.md > "Backend Django — état d'avancement").
+# psycopg[binary]==3.2.*
