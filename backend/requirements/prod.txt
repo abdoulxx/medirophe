@@ -1,4 +1,5 @@
 -r base.txt
-# Driver PostgreSQL — à activer dès que l'infra Postgres est en place
-# (voir CLAUDE.md > "Backend Django — état d'avancement").
-# psycopg[binary]==3.2.*
+# Driver PostgreSQL, requis par DATABASE_URL en production (voir docker-compose.yml).
+psycopg[binary]==3.2.*
+# Serveur WSGI de production (voir Dockerfile).
+gunicorn==23.0.0

@@ -13,12 +13,16 @@ from .models import AuditLog
 def get_client_ip(request):
     """Adresse IP du client.
 
-    Pas de reverse proxy/load balancer devant l'app à ce stade (voir
-    CLAUDE.md "Explicitly deferred" §10) : REMOTE_ADDR est fiable tel quel.
-    Ne pas lire X-Forwarded-For tant qu'aucun proxy de confiance n'est
-    configuré — un client pourrait sinon usurper son IP dans le journal.
+    En déploiement Docker (voir docker-compose.yml), nginx est l'unique
+    reverse proxy devant l'app et *remplace* (n'ajoute pas à) X-Forwarded-For
+    par $remote_addr avant de transmettre à Gunicorn (voir deploy/nginx.conf)
+    — un client ne peut donc pas usurper cette valeur, elle est fiable telle
+    quelle. Fallback sur REMOTE_ADDR pour le dev local (pas de proxy devant
+    `runserver`, X-Forwarded-For y est absent).
     """
-    return request.META.get("REMOTE_ADDR") if request is not None else None
+    if request is None:
+        return None
+    return request.META.get("HTTP_X_FORWARDED_FOR") or request.META.get("REMOTE_ADDR")
 
 
 def record(action, *, actor=None, actor_email="", target_user=None, request=None, **metadata):

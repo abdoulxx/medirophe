@@ -1,0 +1,60 @@
+name: CI/CD backend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DJANGO_SECRET_KEY: ci-test-secret-key-not-used-in-prod
+      DJANGO_DEBUG: "True"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements/dev.txt
+
+      - run: python manage.py migrate
+
+      - run: python -m pytest
+
+      # Même garde-fou qu'en local (voir CLAUDE.md "Commands") : la CI échoue
+      # si settings/prod.py régresse sur un point de sécurité déploiement.
+      - name: Deployment security check (settings/prod.py)
+        run: python manage.py check --deploy --settings=config.settings.prod
+        env:
+          DJANGO_ALLOWED_HOSTS: example.com
+          DJANGO_SECURE_SSL_REDIRECT: "True"
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      # Ne pousse aucun secret applicatif : le serveur possède déjà son
+      # propre backend/.env (créé une fois manuellement, voir DEPLOY.md).
+      # Ce job se contente de faire avancer le code et reconstruire l'image.
+      - name: Déploiement SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/medirophe
+            git pull origin main
+            cd backend
+            docker compose up -d --build

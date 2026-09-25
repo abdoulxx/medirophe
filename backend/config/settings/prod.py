@@ -20,13 +20,25 @@ if not ALLOWED_HOSTS:
         "DJANGO_ALLOWED_HOSTS doit être défini explicitement en production."
     )
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Sécurisé par défaut (True) : redirection HTTPS, cookies secure, HSTS.
+# Doit être temporairement mis à False (DJANGO_SECURE_SSL_REDIRECT=False côté
+# serveur) tant que le déploiement tourne en IP nue sans domaine/TLS devant
+# nginx (voir DEPLOY.md) — à repasser à True (ou supprimer la variable) dès
+# qu'un certificat est en place, sans toucher au code.
+_use_tls = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+SECURE_SSL_REDIRECT = _use_tls
+SESSION_COOKIE_SECURE = _use_tls
+CSRF_COOKIE_SECURE = _use_tls
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_SECONDS = 31536000 if _use_tls else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _use_tls
+SECURE_HSTS_PRELOAD = _use_tls
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+
+# Requis dès que l'admin Django (session+CSRF, contrairement à l'API qui est
+# en JWT) est servi derrière un reverse proxy / sur une origine explicite.
+# Ex. DJANGO_CSRF_TRUSTED_ORIGINS=http://169.58.78.224 (http:// tant que
+# _use_tls est False, https:// une fois le certificat en place).
+CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])

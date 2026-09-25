@@ -47,6 +47,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Juste après SecurityMiddleware : sert /static/ (admin, docs OpenAPI en
+    # dev) directement depuis Gunicorn, sans conteneur/volume nginx dédié.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -197,4 +200,15 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    # Manifest + compression : purge le cache navigateur automatiquement à
+    # chaque déploiement (nom de fichier haché) sans configuration serveur.
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Comportement identique en dev et prod : seul un reverse proxy (nginx) place
+# ce header en prod ; en local il est simplement absent, donc ignoré.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
