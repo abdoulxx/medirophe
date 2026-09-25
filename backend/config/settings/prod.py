@@ -11,7 +11,12 @@ sécurité, monitoring/alerting...).
 """
 from .base import *  # noqa: F401,F403
 
-DEBUG = False
+# False par défaut (vraie prod). Peut être mis à True via DJANGO_DEBUG=True
+# côté serveur pour un environnement de dev/staging exposé publiquement
+# (ex. activer Swagger/ReDoc, voir config/urls.py) — accepter alors le
+# compromis : DEBUG=True fait fuiter la stack trace (et des secrets) sur
+# une erreur serveur, à réserver à un environnement non critique.
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 # ALLOWED_HOSTS doit être fourni explicitement en prod (pas de valeur par
 # défaut ici) : voir DJANGO_ALLOWED_HOSTS dans base.py.
