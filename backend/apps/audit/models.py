@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 
@@ -14,6 +15,13 @@ class AuditAction(models.TextChoices):
     USER_CREATED = "user_created", "Compte créé"
     USER_UPDATED = "user_updated", "Compte modifié (rôle/statut)"
     USER_DELETED = "user_deleted", "Compte supprimé définitivement"
+    PATIENT_CREATED = "patient_created", "Dossier patient créé"
+    PATIENT_UPDATED = "patient_updated", "Dossier patient modifié"
+    PATIENT_ARCHIVED = "patient_archived", "Dossier patient archivé"
+    PATIENT_REACTIVATED = "patient_reactivated", "Dossier patient réactivé"
+    PATIENT_DELETED = "patient_deleted", "Dossier patient supprimé définitivement"
+    PATIENT_VIEWED = "patient_viewed", "Dossier patient consulté"
+    PATIENT_LIST_VIEWED = "patient_list_viewed", "Liste des patients consultée"
 
 
 class AuditLog(models.Model):
@@ -52,7 +60,10 @@ class AuditLog(models.Model):
     target_user_email = models.EmailField(blank=True)
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
-    metadata = models.JSONField(default=dict, blank=True)
+    # DjangoJSONEncoder : les métadonnées d'un module métier (ex. patients)
+    # peuvent contenir des `date`/`Decimal`/`UUID` (diffs before/after de champs
+    # cliniques) que `json.dumps` seul ne sait pas sérialiser.
+    metadata = models.JSONField(default=dict, blank=True, encoder=DjangoJSONEncoder)
 
     class Meta:
         ordering = ["-created_at"]
