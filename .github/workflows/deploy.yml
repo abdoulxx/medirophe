@@ -55,6 +55,6 @@ jobs:
           script: |
             set -e
             cd /opt/medirophe
-            git pull origin main
+            git pull origin integration
             cd backend
             docker compose up -d --build
