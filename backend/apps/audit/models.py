@@ -22,6 +22,13 @@ class AuditAction(models.TextChoices):
     PATIENT_DELETED = "patient_deleted", "Dossier patient supprimé définitivement"
     PATIENT_VIEWED = "patient_viewed", "Dossier patient consulté"
     PATIENT_LIST_VIEWED = "patient_list_viewed", "Liste des patients consultée"
+    CONSULTATION_CREATED = "consultation_created", "Consultation créée"
+    CONSULTATION_UPDATED = "consultation_updated", "Consultation modifiée"
+    CONSULTATION_TERMINEE = "consultation_terminee", "Consultation terminée"
+    CONSULTATION_ANNULEE = "consultation_annulee", "Consultation annulée"
+    CONSULTATION_DELETED = "consultation_deleted", "Consultation supprimée définitivement"
+    CONSULTATION_VIEWED = "consultation_viewed", "Consultation consultée"
+    CONSULTATION_LIST_VIEWED = "consultation_list_viewed", "Liste des consultations consultée"
 
 
 class AuditLog(models.Model):

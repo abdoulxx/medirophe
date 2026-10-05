@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.audit",
     "apps.patients",
+    "apps.consultations",
 ]
 
 MIDDLEWARE = [
@@ -133,7 +134,12 @@ REST_FRAMEWORK = {
     # LocMemCache (par processus, suffisant pour un seul worker dev) — un
     # cache partagé (Redis) sera nécessaire pour une limite globale en
     # production multi-instance.
-    "DEFAULT_THROTTLE_RATES": {"login": "5/min", "password-reset": "3/min", "patients": "120/min"},
+    "DEFAULT_THROTTLE_RATES": {
+        "login": "5/min",
+        "password-reset": "3/min",
+        "patients": "120/min",
+        "consultations": "120/min",
+    },
 }
 
 # --------------------------------------------------------------------------
