@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.patients",
     "apps.consultations",
+    "apps.prescriptions",
 ]
 
 MIDDLEWARE = [
@@ -139,6 +140,7 @@ REST_FRAMEWORK = {
         "password-reset": "3/min",
         "patients": "120/min",
         "consultations": "120/min",
+        "prescriptions": "120/min",
     },
 }
 

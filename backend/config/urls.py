@@ -28,6 +28,7 @@ urlpatterns = [
     path("api/v1/audit/", include("apps.audit.urls")),
     path("api/v1/patients/", include("apps.patients.urls")),
     path("api/v1/consultations/", include("apps.consultations.urls")),
+    path("api/v1/prescriptions/", include("apps.prescriptions.urls")),
 ]
 
 if settings.DEBUG:

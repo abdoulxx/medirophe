@@ -29,6 +29,13 @@ class AuditAction(models.TextChoices):
     CONSULTATION_DELETED = "consultation_deleted", "Consultation supprimée définitivement"
     CONSULTATION_VIEWED = "consultation_viewed", "Consultation consultée"
     CONSULTATION_LIST_VIEWED = "consultation_list_viewed", "Liste des consultations consultée"
+    PRESCRIPTION_EXAMEN_CREATED = "prescription_examen_created", "Demande d'examen créée"
+    PRESCRIPTION_EXAMEN_UPDATED = "prescription_examen_updated", "Demande d'examen modifiée"
+    PRESCRIPTION_EXAMEN_VALIDEE = "prescription_examen_validee", "Demande d'examen validée (résultat terminé)"
+    PRESCRIPTION_EXAMEN_REJETEE = "prescription_examen_rejetee", "Demande d'examen rejetée (échantillon)"
+    PRESCRIPTION_EXAMEN_DELETED = "prescription_examen_deleted", "Demande d'examen supprimée définitivement"
+    PRESCRIPTION_EXAMEN_VIEWED = "prescription_examen_viewed", "Demande d'examen consultée"
+    PRESCRIPTION_EXAMEN_LIST_VIEWED = "prescription_examen_list_viewed", "Liste des demandes d'examen consultée"
 
 
 class AuditLog(models.Model):
